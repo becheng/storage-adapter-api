@@ -1,0 +1,4 @@
+[submodule "api/storageAdapter.Models"]
+	path = api/storageAdapter.Models
+	url = https://github.com/becheng/storageAdapter.Models.git
+	branch=main

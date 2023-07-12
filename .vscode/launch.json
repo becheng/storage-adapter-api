@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch StorageAdapterApi",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-storage-adapter",
+            "program": "${workspaceFolder}/api/bin/Debug/net6.0/storageAdapterApi.dll",
+            "cwd": "${workspaceFolder}/api",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "AZURE_CLIENT_ID": "f83d1020-1ef8-4db4-9b9d-04d3744bd476",
+                "AZURE_TENANT_ID":"4bb7d7b5-0ac2-4569-94e6-b715e9d43a5d",
+                "AZURE_CLIENT_SECRET": "V7h8Q~AnaV95eDLFbnPCkovGDYAFFhzP6KoX~aBF"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
+
