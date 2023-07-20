@@ -4,21 +4,26 @@ using Azure;
 using Azure.Identity;
 using Azure.Data.Tables;
 using StorageAdapterClientModels::StorageAdapter.Models;
-using Azure.Security.KeyVault.Secrets;
 
 var builder = WebApplication.CreateBuilder(args);
+
+string? GetEnvVar(string key) => Environment.GetEnvironmentVariable(key);
 
 // add the storage TableServiceClient
 builder.Services.AddSingleton<TableClient>(
     new TableClient(
-        new Uri( builder.Configuration["StorageTableUri"] ),
-        builder.Configuration["StorageTableName"],
+        // new Uri( builder.Configuration["StorageTableUri"] ),
+        // builder.Configuration["StorageTableName"],
+        new Uri(GetEnvVar("STORAGE_TABLE_URI")),
+        GetEnvVar("STORAGE_TABLE_NAME"),
         new DefaultAzureCredential())
 );
 
+
 // add the key vault - Reminder to set the RBAC (e.g. 'Key Vault Secrets User' )to the local SP for the key vault 
 builder.Configuration.AddAzureKeyVault(
-    new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+    // new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
+    new Uri($"https://{GetEnvVar("KEYVAULT_NAME")}.vault.azure.net/"),
     new DefaultAzureCredential()
 );
 
@@ -37,7 +42,7 @@ app.MapGet("/storageMapping/{tenantId}", async (TableClient tableClient, string 
 {
     try 
     {
-        AsyncPageable<TenantToStorageMapping> queryResults = tableClient.QueryAsync<TenantToStorageMapping>(ent => ent.CxTenantId == tenantId);
+        AsyncPageable<TenantToStorageMapping> queryResults = tableClient.QueryAsync<TenantToStorageMapping>(ent => ent.CxTenantId == Guid.Parse(tenantId));
         List<TenantToStorageMapping> aList = await queryResults.ToListAsync();
         IResult aResult = Results.NotFound();
         if (aList.Count == 0) 
@@ -79,7 +84,7 @@ if (builder.Environment.IsDevelopment()) {
 
     // // table rbac test
     app.MapGet("/storageTest", async (TableClient tableClient) => {
-        AsyncPageable<TableEntity> queryResults = tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'storageadapter'");
+        AsyncPageable<TableEntity> queryResults = tableClient.QueryAsync<TableEntity>(filter: $"PartitionKey eq 'storageAdapterTenants'");
         return "Table query results: " + (await queryResults.ToListAsync()).Count;
     });
 
@@ -87,7 +92,7 @@ if (builder.Environment.IsDevelopment()) {
     app.MapGet("/storageTest/{tenantId}", async (TableClient tableClient, string tenantId) => 
     {
         AsyncPageable<TenantToStorageMapping> queryResults = 
-            tableClient.QueryAsync<TenantToStorageMapping>(ent => ent.CxTenantId == tenantId);
+            tableClient.QueryAsync<TenantToStorageMapping>(ent => ent.CxTenantId == Guid.Parse(tenantId));
         TenantToStorageMapping tenantToStorageMapping = (await queryResults.ToListAsync()).ElementAt(0);
 
         // TODO - retrieve any references to the key vault secrets in the tenantToStorageMapping object

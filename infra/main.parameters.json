@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "${AZURE_ENV_NAME}"
+    },
+    "location": {
+      "value": "${AZURE_LOCATION}"
+    },
+    "storageTableName": {
+      "value": "${AZURE_STORAGE_TABLE_NAME}"
+    },
+    "keyVaultName": {
+      "value": "${AZURE_KEYVAULT_NAME}"
+    },
+    "containerAppExists": {
+      "value": "${SERVICE_STORAGE_ADAPTER_API_RESOURCE_EXISTS}"
+    }
+  }
+}

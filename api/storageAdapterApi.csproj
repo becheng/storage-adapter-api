@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>eb461b83-d8a1-4366-85ee-77a945e2268a</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
   </ItemGroup>
 
   <!--copy key artifacts to the output directory -->
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Update="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -23,10 +24,10 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
-    <ProjectReference Include="storageAdapter.Models\src\storageAdapterModels.csproj" Aliases="StorageAdapterClientModels"/>
+    <ProjectReference Include="storageAdapter.Models\src\storageAdapterModels.csproj" Aliases="StorageAdapterClientModels" />
   </ItemGroup>
 
 </Project>
