@@ -59,6 +59,7 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_STORAGE_TABLE_NAME: ${{ vars.AZURE_STORAGE_TABLE_NAME }}
 
       - name: Deploy Application
         run: azd deploy --no-prompt
