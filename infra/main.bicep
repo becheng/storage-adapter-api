@@ -122,12 +122,8 @@ module keyVaultSecrets 'core/security/keyvault-secrets.bicep' = {
     tags: tags
     secrets: [
       {
-        name: 'MultiTenantApp--ClientId'
-        value: 'aclientid'
-      }
-      {
-        name: 'MultiTenantApp--ClientSecret'
-        value: 'asecret'
+        name: 'secret-from-keyvault-direct'
+        value: 'hello from keyvault'
       }
       {
         name: 'AwsS3--accessKey'
@@ -138,6 +134,18 @@ module keyVaultSecrets 'core/security/keyvault-secrets.bicep' = {
         value: 'asecret'
       }
     ]
+  }
+}
+
+// set a single secret in key vault so we get its uri as an output
+module linkedKVSecret 'core/security/keyvault-secret.bicep' = {
+  scope: rg
+  name: 'linked-kv-secret'
+  params: {
+    keyVaultName: keyVault.outputs.name
+    tags: tags
+    name: 'secret-stored-in-kv-and-linked'
+    secretValue: 'hello from kevault thru container app'
   }
 }
 
@@ -159,7 +167,7 @@ module containerApps 'core/host/container-apps.bicep' = {
 module app './core/host/container-app-upsert.bicep' = {
   name: 'conatiner-app'
   scope: rg
-  dependsOn: [ containerApps ]
+  dependsOn: [ containerApps, linkedKVSecret ]
   params: {
     name: 'storageadapterapi-container-app'
     location: rg.location
@@ -189,6 +197,25 @@ module app './core/host/container-app-upsert.bicep' = {
       {
         name: 'ASPNETCORE_ENVIRONMENT'
         value: 'Development'
+      }
+      {
+        name: 'secret-from-containerapp'
+        secretRef: 'secret-from-containerapp'
+      }
+      {
+        name: 'secret-from-kv-linked-containerapp'
+        secretRef: 'secret-from-kv-linked-containerapp'
+      }
+    ]
+    secrets: [
+      {
+        name: 'secret-from-containerapp'
+        value: 'hello from container app'
+      }
+      {
+        name: 'secret-from-kv-linked-containerapp'
+        keyVaultUrl: linkedKVSecret.outputs.secretUri
+        identity: 'System'
       }
     ]
     targetPort: 80
@@ -236,6 +263,8 @@ output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
 output AZURE_STORAGE_AUTH_MODE string = 'key'
-output AZURE_STORAGE_TABLE_URI string = storage.outputs.tableUri
-output AZURE_KEYVAULT_NAME string = keyVault.outputs.name
+
+output AZURE_STORAGE_TABLE_URI_TMP string = storage.outputs.tableUri
+output AZURE_KEYVAULT_NAME_TMP string = keyVault.outputs.name
+output AZURE_SECRETURI_TMP string = linkedKVSecret.outputs.secretUri
 

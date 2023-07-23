@@ -7,23 +7,17 @@ using StorageAdapterClientModels::StorageAdapter.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? GetEnvVar(string key) => Environment.GetEnvironmentVariable(key);
-
 // add the storage TableServiceClient
 builder.Services.AddSingleton<TableClient>(
     new TableClient(
-        // new Uri( builder.Configuration["StorageTableUri"] ),
-        // builder.Configuration["StorageTableName"],
-        new Uri(GetEnvVar("STORAGE_TABLE_URI")),
-        GetEnvVar("STORAGE_TABLE_NAME"),
+        new Uri( builder.Configuration["STORAGE_TABLE_URI"] ),
+        builder.Configuration["STORAGE_TABLE_NAME"],
         new DefaultAzureCredential())
 );
 
-
 // add the key vault - Reminder to set the RBAC (e.g. 'Key Vault Secrets User' )to the local SP for the key vault 
 builder.Configuration.AddAzureKeyVault(
-    // new Uri($"https://{builder.Configuration["KeyVaultName"]}.vault.azure.net/"),
-    new Uri($"https://{GetEnvVar("KEYVAULT_NAME")}.vault.azure.net/"),
+    new Uri($"https://{builder.Configuration["KEYVAULT_NAME"]}.vault.azure.net/"),
     new DefaultAzureCredential()
 );
 
@@ -70,7 +64,17 @@ app.MapGet("/storageMapping/{tenantId}", async (TableClient tableClient, string 
 // dev only endpoints
 if (builder.Environment.IsDevelopment()) {
     // usage: 'dotnet user-secrets set "secretKeyTest" "secretValueTest_dev"'
-    // app.MapGet("/kvTest", (IConfiguration config) => "Not so secret pulled from key vault: " + config["secretKeyTest"]);
+    app.MapGet("/secretTest", (IConfiguration config) => "Secret-from-config: " + config["secretKeyTest"]);
+    app.MapGet("/secretTest2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secretKeyTest") );
+    
+    app.MapGet("/secret-from-keyvault-direct1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-keyvault-direct"]);
+    app.MapGet("/secret-from-keyvault-direct2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-keyvault-direct"));
+    
+    app.MapGet("/secret-from-containerapp1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-containerapp"]);
+    app.MapGet("/secret-from-containerapp2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-containerapp"));
+
+    app.MapGet("/secret-from-kv-linked-containerapp1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-kv-linked-containerapp"]);
+    app.MapGet("/secret-from-kv-linked-containerapp2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-kv-linked-containerapp"));
 
     // https://storadpthck-kv.vault.azure.net/secrets/testsecret/39aa4acbd249423586c4584a8c7264ec
     // ref: https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/security/key-vault-configuration/samples/6.x/KeyVaultConfigurationSample/Program.cs
