@@ -63,6 +63,9 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           AZURE_STORAGE_TABLE_NAME: ${{ vars.AZURE_STORAGE_TABLE_NAME }}
 
+      - name: Test env vars
+        run: azd env get-values
+  
       - name: Deploy Application
         run: azd deploy --no-prompt
         env:
