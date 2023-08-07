@@ -81,7 +81,6 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 module storage 'core/storage/storage-account.bicep' = {
   name: 'storage'
   scope: rg
-  // dependsOn: [ app ]
   params: {
     name: !empty(storageAccountName) ? storageAccountName : '${substring('${abbrs.storageStorageAccounts}${normalizedEnvironmentName}', 0, 24)}'
     location: rg.location
@@ -90,7 +89,6 @@ module storage 'core/storage/storage-account.bicep' = {
     sku: {
       name: 'Standard_LRS'
     }
-    // principalId: app.outputs.managedSystemIdentity
     containers: storageContainerNames
     tables: [
       {
@@ -104,12 +102,10 @@ module storage 'core/storage/storage-account.bicep' = {
 module keyVault 'core/security/keyvault.bicep' = {
   name: 'keyvault'
   scope: rg
-  // dependsOn: [ app ]
   params: {
     name: !empty(keyVaultName) ? keyVaultName : '${substring('${abbrs.keyVaultVaults}${normalizedEnvironmentName}', 0, 24)}'
     location: rg.location
     tags: tags
-    // principalId: app.outputs.managedSystemIdentity
   }
 }
 
@@ -191,10 +187,6 @@ module app './core/host/container-app-upsert.bicep' = {
         value: 'tenantToStorageMapping'
       }            
       {
-        name: 'KEYVAULT_NAME'
-        value: keyVault.outputs.name
-      }
-      {
         name: 'ASPNETCORE_ENVIRONMENT'
         value: 'Development'
       }
@@ -256,15 +248,23 @@ module kvAccess 'core/security/keyvault-access.bicep' = {
   }
 }
 
+// set the rbac to the storage table and containers using the app's MSI
+module storageScriptAccess 'core/security/storage-access.bicep' = {
+  scope: rg
+  name: 'storage-script-access'
+  params: {
+    storageAccountName: storage.outputs.name
+    principalId: '857c3600-9604-4b41-b870-0d1ebbdce11e'  //objectId of the SP used to run table scripts
+    tableRoleDefinitionId: '81a9662b-bebf-436f-a333-f67b29880f12' // set to the Storage Account Key Operator Service Role
+    mode: 'tableOnly'
+  }
+}
+
 // Outputs are automatically saved in the local azd environment .env file.
 // To see these outputs, run `azd env get-values`,  or `azd env get-values --output json` for json output.
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
-output AZURE_STORAGE_AUTH_MODE string = 'key'
-
-output AZURE_STORAGE_TABLE_URI_TMP string = storage.outputs.tableUri
-output AZURE_KEYVAULT_NAME_TMP string = keyVault.outputs.name
-output AZURE_SECRETURI_TMP string = linkedKVSecret.outputs.secretUri
+// output AZURE_STORAGE_AUTH_MODE string = 'key'
 

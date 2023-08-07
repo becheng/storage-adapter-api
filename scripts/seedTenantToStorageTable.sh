@@ -27,11 +27,16 @@ az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenan
 echo ""
 echo "Adding table entities."
 echo ""
-echo "Note: if this is the first time running azd deploy, you will need to manually set the AZURE_STORAGE_KEY environment variable with storage account key in the .env file"
-echo "While it is technically possible to set this value using the bicep outputs but exposing sensitive info such as an account key is considered a security risk and likewise it would be flagged by the bicep linter for the same."
-echo ""
-echo "Note2: if erroring out, check the table authentication method is set to 'access key' in the portal"
-echo ""
+# echo "Note: if this is the first time running azd deploy, you will need to manually set the AZURE_STORAGE_KEY environment variable with storage account key in the .env file"
+# echo "While it is technically possible to set this value using the bicep outputs but exposing sensitive info such as an account key is considered a security risk and likewise it would be flagged by the bicep linter for the same."
+# echo ""
+# echo "Note2: if erroring out, check the table authentication method is set to 'access key' in the portal"
+# echo ""
+
+# set the AZURE_STORAGE_KEY environment variable programmatically 
+# requires the 'Storage Account Key Operator Service Role' rbac role
+export AZURE_STORAGE_KEY="$(az storage account keys list --account-name $AZURE_STORAGE_ACCOUNT --resource-group "rg-$AZURE_ENV_NAME" --query "[0].value" -o tsv)"
+# echo "storage account key = $AZURE_STORAGE_KEY" 
 
 partitionKey1="storageAdapterTenants"
 
