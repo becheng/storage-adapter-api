@@ -62,6 +62,7 @@ jobs:
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           AZURE_STORAGE_TABLE_NAME: ${{ vars.AZURE_STORAGE_TABLE_NAME }}
+          DEPLOY_SP_OBJID: ${{ secrets.DEPLOY_SP_OBJID }}
 
       - name: Test env vars run 1
         run: azd env get-values
@@ -74,7 +75,6 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          DEPLOY_SP_OBJID: ${{ secrets.DEPLOY_SP_OBJID }}
 
       - name: Test env vars run 2
         run: azd env get-values
