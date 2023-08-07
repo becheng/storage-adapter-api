@@ -11,11 +11,11 @@
     "storageTableName": {
       "value": "${AZURE_STORAGE_TABLE_NAME}"
     },
-    "keyVaultName": {
-      "value": "${AZURE_KEYVAULT_NAME}"
-    },
     "containerAppExists": {
       "value": "${SERVICE_STORAGE_ADAPTER_API_RESOURCE_EXISTS}"
+    },
+    "deployScriptsServicePrincipalObjectId": {
+      "value": "${DEPLOY_SP_OBJID}"
     }
   }
 }

@@ -59,6 +59,9 @@ param imageName string = ''
 @description('Indicates if the container app exists')
 param containerAppExists bool = false
 
+@description('Object Id of the Service Principal to run table scripts')
+param deployScriptsServicePrincipalObjectId string = ''
+
 var abbrs = loadJsonContent('./abbreviations.json')
 
 // tags that should be applied to all resources.
@@ -254,7 +257,7 @@ module storageScriptAccess 'core/security/storage-access.bicep' = {
   name: 'storage-script-access'
   params: {
     storageAccountName: storage.outputs.name
-    principalId: '857c3600-9604-4b41-b870-0d1ebbdce11e'  //objectId of the SP used to run table scripts
+    principalId: deployScriptsServicePrincipalObjectId  //objectId of the SP used to run table scripts
     tableRoleDefinitionId: '81a9662b-bebf-436f-a333-f67b29880f12' // set to the Storage Account Key Operator Service Role
     mode: 'tableOnly'
   }
