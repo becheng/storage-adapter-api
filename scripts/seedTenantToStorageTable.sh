@@ -40,6 +40,19 @@ export AZURE_STORAGE_KEY="$(az storage account keys list --account-name $AZURE_S
 
 partitionKey1="storageAdapterTenants"
 
+az storage entity insert \
+--entity PartitionKey=$partitionKey1 RowKey=1 \
+StorageIdentifier="storageadapterhack" \
+StorageAccessKeySecretRef="4KO2FU7fBX7yYyRA4+FaMzvbJi/IDt1zw3XGqKKr8bfIxDGOOe1fP+JRae3guMF5+CA4hPYw/Sn4+AStL00c/A==" \
+ConnectionType="AzConnectionString" \
+ContainerName="cont4tenant1" \
+CxTenantId@odata.type="Edm.Guid" CxTenantId="1cdc6cfa-0f73-4d65-a69e-86d1078b1266" \
+CxTenantName="AdventureWorks" \
+IsAzureCrossTenant@odata.type="Edm.Boolean" IsAzureCrossTenant=false \
+StorageRegion="CanadaCentral" \
+StorageType="AzStorage" \
+--if-exists replace \
+--table-name $AZURE_STORAGE_TABLE_NAME
 
 az storage entity insert \
 --entity PartitionKey=$partitionKey1 RowKey=2 \

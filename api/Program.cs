@@ -16,10 +16,10 @@ builder.Services.AddSingleton<TableClient>(
 );
 
 // add the key vault - Reminder to set the RBAC (e.g. 'Key Vault Secrets User' )to the local SP for the key vault 
-builder.Configuration.AddAzureKeyVault(
-    new Uri($"https://{builder.Configuration["KEYVAULT_NAME"]}.vault.azure.net/"),
-    new DefaultAzureCredential()
-);
+// builder.Configuration.AddAzureKeyVault(
+//     new Uri($"https://{builder.Configuration["KEYVAULT_NAME"]}.vault.azure.net/"),
+//     new DefaultAzureCredential()
+// );
 
 var app = builder.Build();
 
