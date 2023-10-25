@@ -8,14 +8,23 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
-    "storageTableName": {
-      "value": "${AZURE_STORAGE_TABLE_NAME}"
-    },
     "containerAppExists": {
       "value": "${SERVICE_STORAGE_ADAPTER_API_RESOURCE_EXISTS}"
     },
     "deployScriptsServicePrincipalObjectId": {
       "value": "${DEPLOY_SP_OBJID}"
+    },
+    "multitenantSPClientId": {
+      "value": "${MULTITENANT_SP_CLIENT_ID}"
+    },
+    "multitenantSPClientSecret": {
+      "value": "${MULTITENANT_SP_CLIENT_SECRET}"
+    },
+    "storageAccountAccessKey": {
+      "value": "${STORAGE_ACCOUNT_ACCESS_KEY}"
+    },
+    "awsS3AccessKey": {
+      "value": "${AWSS3_ACCESS_KEY}"
     }
-  }
+  } 
 }

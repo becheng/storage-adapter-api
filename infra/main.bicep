@@ -16,9 +16,8 @@ param resourceGroupName string = ''
 param storageAccountName string = ''
 
 @description('Name of the storage table')
-param storageTableName string = ''
+param storageTableName string = 'tenantToStorageMapping'
 
-// TODO: erroring on first time provisioning, error: PublicAccessNotPermitted: Public access is not permitted on this storage account.
 @description('An array of storage container names')
 param storageContainerNames array = [
   {
@@ -61,6 +60,24 @@ param containerAppExists bool = false
 
 @description('Object Id of the Service Principal to run table scripts')
 param deployScriptsServicePrincipalObjectId string = ''
+
+@description('Client ID of the multitenant service principal used for cross tenant storage access')
+param multitenantSPClientId string = ''
+
+// the following 'secret' params are used only for demo purposes
+// for a real deployment, look at using the 'getSecret' function to retrieve the secret from the key vault
+// https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/azure-resource-manager/bicep/scenarios-secrets.md#use-a-key-vault-with-modules
+@description('Client secret of the multitenant service principal used for cross tenant storage access')
+@secure()
+param multitenantSPClientSecret string = ''
+
+@description('Storage account access key for tenant1 - an azure storeage acct user')
+@secure()
+param storageAccountAccessKey string = ''
+
+@description('Storage account access key for tenant2 - an aws s3 user')
+@secure()
+param awsS3AccessKey string = ''
 
 var abbrs = loadJsonContent('./abbreviations.json')
 
@@ -112,7 +129,7 @@ module keyVault 'core/security/keyvault.bicep' = {
   }
 }
 
-// populate key vault with secrets
+// populate key vault with multiple secrets
 module keyVaultSecrets 'core/security/keyvault-secrets.bicep' = {
   scope: rg
   name: 'keyvault-secrets'
@@ -121,30 +138,37 @@ module keyVaultSecrets 'core/security/keyvault-secrets.bicep' = {
     tags: tags
     secrets: [
       {
-        name: 'secret-from-keyvault-direct'
-        value: 'hello from keyvault'
+        name: 'multitenantSP--clientId'
+        value: multitenantSPClientId
       }
       {
-        name: 'AwsS3--accessKey'
-        value: 'awsAccessKey'
-      }
-      {
-        name: 'AwsS3--accessSecret'
-        value: 'asecret'
+        name: 'multitenantSP--clientSecret'
+        value: multitenantSPClientSecret
       }
     ]
   }
 }
 
 // set a single secret in key vault so we get its uri as an output
-module linkedKVSecret 'core/security/keyvault-secret.bicep' = {
+module cust1StorageKVSecret 'core/security/keyvault-secret.bicep' = {
   scope: rg
-  name: 'linked-kv-secret'
+  name: 'cust1-storage-kvSecret'
   params: {
     keyVaultName: keyVault.outputs.name
     tags: tags
-    name: 'secret-stored-in-kv-and-linked'
-    secretValue: 'hello from kevault thru container app'
+    name: '2b6623da-38e1-445b-80f1-5edd52f3fb7e--storageAccessKey'
+    secretValue: storageAccountAccessKey
+  }
+}
+
+module cust2StorageKVSecret 'core/security/keyvault-secret.bicep' = {
+  scope: rg
+  name: 'cust2-storage-kvSecret'
+  params: {
+    keyVaultName: keyVault.outputs.name
+    tags: tags
+    name: '5e0a2a1f-0376-4453-875c-3d727087d607--storageAccessKey'
+    secretValue: awsS3AccessKey
   }
 }
 
@@ -166,7 +190,7 @@ module containerApps 'core/host/container-apps.bicep' = {
 module app './core/host/container-app-upsert.bicep' = {
   name: 'conatiner-app'
   scope: rg
-  dependsOn: [ containerApps, linkedKVSecret ]
+  dependsOn: [ containerApps, cust1StorageKVSecret, cust2StorageKVSecret ]
   params: {
     name: 'storageadapterapi-container-app'
     location: rg.location
@@ -193,26 +217,29 @@ module app './core/host/container-app-upsert.bicep' = {
         name: 'ASPNETCORE_ENVIRONMENT'
         value: 'Development'
       }
-      {
-        name: 'secret-from-containerapp'
-        secretRef: 'secret-from-containerapp'
-      }
-      {
-        name: 'secret-from-kv-linked-containerapp'
-        secretRef: 'secret-from-kv-linked-containerapp'
-      }
+      // example of the env variable that references a secret stored in the container app
+      // {
+      //   name: 'secret-from-containerapp'
+      //   secretRef: 'secret-from-containerapp'
+      // }
+      // {
+      //   name: 'secret-from-kv-linked-containerapp'
+      //   secretRef: 'secret-from-kv-linked-containerapp'
+      // }
     ]
-    secrets: [
-      {
-        name: 'secret-from-containerapp'
-        value: 'hello from container app'
-      }
-      {
-        name: 'secret-from-kv-linked-containerapp'
-        keyVaultUrl: linkedKVSecret.outputs.secretUri
-        identity: 'System'
-      }
-    ]
+    // secrets: [
+      // example of a secret that is stored in the container app
+      // {
+      //   name: 'secret-from-containerapp'
+      //   value: 'hello from container app'
+      // }
+      // example of a secret that is stored in the key vault and referenced in the container app
+    //   {
+    //     name: 'secret-from-kv-linked-containerapp'
+    //     keyVaultUrl: cust1StorageKVSecret.outputs.secretUri
+    //     identity: 'System'
+    //   }
+    // ]
     targetPort: 80
   }
 }
@@ -269,5 +296,4 @@ output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registryLoginServer
 output AZURE_STORAGE_ACCOUNT string = storage.outputs.name
-// output AZURE_STORAGE_AUTH_MODE string = 'key'
-
+output AZURE_STORAGE_TABLE_NAME string = storage.outputs.tableName

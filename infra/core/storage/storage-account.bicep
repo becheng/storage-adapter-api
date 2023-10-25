@@ -71,3 +71,4 @@ output name string = storage.name
 output primaryEndpoints object = storage.properties.primaryEndpoints
 output storageId string = storage.id
 output tableUri string = storage.properties.primaryEndpoints.table
+output tableName string = storage::tableServices::table[0].name

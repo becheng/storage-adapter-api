@@ -61,10 +61,15 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          AZURE_STORAGE_TABLE_NAME: ${{ vars.AZURE_STORAGE_TABLE_NAME }}
           DEPLOY_SP_OBJID: ${{ secrets.DEPLOY_SP_OBJID }}
+          DEPLOY_SP_CLIENT_ID: ${{ vars.DEPLOY_SP_CLIENT_ID }}
+          DEPLOY_SP_CLIENT_SECRET: ${{ secrets.DEPLOY_SP_CLIENT_SECRET }}
+          MULTITENANT_SP_CLIENT_ID: ${{ vars.MULTITENANT_SP_CLIENT_ID }}
+          MULTITENANT_SP_CLIENT_SECRET: ${{ secrets.MULTITENANT_SP_CLIENT_SECRET }}
+          STORAGE_ACCOUNT_ACCESS_KEY: ${{ secrets.STORAGE_ACCOUNT_ACCESS_KEY }}
+          AWSS3_ACCESS_KEY: ${{ secrets.AWSS3_ACCESS_KEY }}
 
-      - name: Test env vars run 1
+      - name: list env vars after provision
         run: azd env get-values
   
       - name: Deploy Application
@@ -73,10 +78,7 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          AZURE_STORAGE_TABLE_NAME: ${{ vars.AZURE_STORAGE_TABLE_NAME }}
-          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Test env vars run 2
+      - name: list env vars after deploy
         run: azd env get-values
   

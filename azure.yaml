@@ -1,6 +1,7 @@
 name: storage-adapter
 hooks:
-    postdeploy:
+    # or use postdeploy to run after post 'azd deploy'
+    postprovision:
       posix: # Only runs on Posix environments
         shell: sh 
         run: echo 'Seeding TenantToStorageMapping table...' && bash ./scripts/seedTenantToStorageTable.sh 
