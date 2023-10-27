@@ -33,7 +33,7 @@ partitionKey1="storageAdapterTenants"
 
 az storage entity insert \
 --entity PartitionKey=$partitionKey1 RowKey=1 \
-StorageIdentifier="storageadapterhack" \
+StorageIdentifier="stsboxstorageadapter6kvs" \
 StorageAccessKeySecretRef="2b6623da-38e1-445b-80f1-5edd52f3fb7e:storageAccessKey" \
 ConnectionType="AzStorageSharedKey" \
 ContainerName="tenant1" \
@@ -47,7 +47,7 @@ StorageType="AzStorage" \
 
 az storage entity insert \
 --entity PartitionKey=$partitionKey1 RowKey=2 \
-StorageIdentifier="storageadapterhack" \
+StorageIdentifier="stsboxstorageadapter6kvs" \
 StorageAccessKeySecretRef="not-applicable" \
 ConnectionType="AzOauth" \
 ContainerName="tenant2" \

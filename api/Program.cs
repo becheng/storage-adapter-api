@@ -15,15 +15,9 @@ builder.Services.AddSingleton<TableClient>(
         new DefaultAzureCredential())
 );
 
-// add the key vault - Reminder to set the RBAC (e.g. 'Key Vault Secrets User' )to the local SP for the key vault 
-// builder.Configuration.AddAzureKeyVault(
-//     new Uri($"https://{builder.Configuration["KEYVAULT_NAME"]}.vault.azure.net/"),
-//     new DefaultAzureCredential()
-// );
-
 var app = builder.Build();
 
-// disable for now for local development
+// disable for local 
 if (builder.Environment.IsProduction()){
     app.UseHttpsRedirection();
 }
@@ -61,30 +55,10 @@ app.MapGet("/storageMapping/{tenantId}", async (TableClient tableClient, string 
 
 }).WithName("GetStorageMappingByTenantId");
 
+
+
 // dev only endpoints
 if (builder.Environment.IsDevelopment()) {
-    // usage: 'dotnet user-secrets set "secretKeyTest" "secretValueTest_dev"'
-    app.MapGet("/secretTest", (IConfiguration config) => "Secret-from-config: " + config["secretKeyTest"]);
-    app.MapGet("/secretTest2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secretKeyTest") );
-    
-    app.MapGet("/secret-from-keyvault-direct1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-keyvault-direct"]);
-    app.MapGet("/secret-from-keyvault-direct2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-keyvault-direct"));
-    
-    app.MapGet("/secret-from-containerapp1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-containerapp"]);
-    app.MapGet("/secret-from-containerapp2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-containerapp"));
-
-    app.MapGet("/secret-from-kv-linked-containerapp1", (IConfiguration config) => "Secret-from-config: " + config["secret-from-kv-linked-containerapp"]);
-    app.MapGet("/secret-from-kv-linked-containerapp2", () => "Secret-from-env: " + Environment.GetEnvironmentVariable("secret-from-kv-linked-containerapp"));
-
-    // https://storadpthck-kv.vault.azure.net/secrets/testsecret/39aa4acbd249423586c4584a8c7264ec
-    // ref: https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/security/key-vault-configuration/samples/6.x/KeyVaultConfigurationSample/Program.cs
-    app.MapGet("/kvTest", (IConfiguration config) => {
-        return string.Join(
-            Environment.NewLine,
-            $"config[\"testsecret\"] Value: {config["testsecret"]}",
-            $"config[\"Section--SecretName\"] Value: {config["Section:SecretName"]}"
-            );            
-    });
 
     // // table rbac test
     app.MapGet("/storageTest", async (TableClient tableClient) => {
@@ -98,8 +72,6 @@ if (builder.Environment.IsDevelopment()) {
         AsyncPageable<TenantToStorageMapping> queryResults = 
             tableClient.QueryAsync<TenantToStorageMapping>(ent => ent.CxTenantId == Guid.Parse(tenantId));
         TenantToStorageMapping tenantToStorageMapping = (await queryResults.ToListAsync()).ElementAt(0);
-
-        // TODO - retrieve any references to the key vault secrets in the tenantToStorageMapping object
         
         return "Cx Name: " + tenantToStorageMapping.CxTenantName + " CxTenantId: " + tenantToStorageMapping.CxTenantId;
     });

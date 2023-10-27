@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.8.1" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
     <PackageReference Include="Azure.Identity" Version="1.9.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
@@ -27,7 +27,7 @@
   </ItemGroup> -->
 
   <ItemGroup>
-    <ProjectReference Include="storageAdapter.Models\src\storageAdapterModels.csproj" Aliases="StorageAdapterClientModels" />
+    <ProjectReference Include="Models\src\storageAdapterModels.csproj" Aliases="StorageAdapterClientModels" />
   </ItemGroup>
 
 </Project>
