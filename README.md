@@ -1,7 +1,7 @@
 # Storage Adapter API Sample
 A dotnet minimal api sample used to retrieve a tenant/customer storage identifier mappings.  
 
-When used with its client (see [Storage Adapter Client](https://github.com/becheng/storage-adapter-api), the **Storage Adapter** provides an abstraction layer to access multiple Azure Storage accounts and third party storage providers.  In the sample, we demostrate access to an AWS S3 Bucket.
+When used with its client (see [Storage Adapter Client](https://github.com/becheng/storage-adapter-client), the **Storage Adapter** provides an abstraction layer to access multiple Azure Storage accounts and third party storage providers.  In the sample, we demostrate access to an AWS S3 Bucket.
 
 The sample demostrates the following :
 
