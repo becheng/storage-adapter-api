@@ -55,7 +55,7 @@ The sample demostrates the following :
 5. Execute the Github Action manually or via a regular PR.
 
 ## Testing the Storage Adapter
-The [Storage Adapter Client](https://github.com/becheng/storage-adapter-api) comes with a XUnit project and tests.
+The [Storage Adapter Client](https://github.com/becheng/storage-adapter-client) comes with a XUnit project and tests.
 1. Clone the client repo.
 2. Configure the test data in the project's `appsettings.Test.json` witin the test folder.
 3. Configure the `appsettings.Development.json` to point to the deployed Storage Adapter API endpoint and key vault.  Note: if running locally, make sure the local Service Principal used has the RBAC (Azure Storage Blob Data Contributor, Azure Table Data Reader) to both the storage account that contains the blob containers and Azure Table that contains the customer mappings.     
